@@ -73,12 +73,12 @@ function main() {
                 //bonusSound: ['assets/bonus.wav']
             }
         };
-        
-        game.load.audio('flap', ['assets/flapping.mp3']);
+        game.load.audio('sounds',['assets/supersprite.wav']);
+        game.load.audio('flap', ['assets/flapping.wav']);
         game.load.audio('score',['assets/winning.wav']);
         game.load.audio('hurt',['assets/hit.wav']);
         game.load.audio('bonusSound',['assets/bonus.wav']);
-        
+
         Object.keys(assets).forEach(function(type) {
             Object.keys(assets[type]).forEach(function(id) {
                 game.load[type].apply(game.load, [id].concat(assets[type][id]));
@@ -109,11 +109,19 @@ function main() {
             fingersTimer,
             cloudsTimer,
             bulletsTimer,
-            bonusTimer;
+            bonusTimer,
+            music;
 
     function create() {
         //create sounds
+        music = game.add.audio('sounds');
+        music.override = true;
 
+        music.addMarker('bonus', 0, .538, .5, false);
+        music.addMarker('flap',0.539,0.440,.5, false);
+        music.addMarker('hit', .992, 1, .5,false);
+        music.addMarker('winning', 2.69, 3, .5.false);
+        
         // Set world dimensions
         var screenWidth = parent.clientWidth > window.innerWidth ? window.innerWidth : parent.clientWidth;
         var screenHeight = parent.clientHeight > window.innerHeight ? window.innerHeight : parent.clientHeight;
@@ -209,7 +217,7 @@ function main() {
         gameOverText.anchor.setTo(0.5, 0.5);
         gameOverText.scale.setTo(2, 2);
         // Add sounds
-        flapSnd = game.add.audio('flap',1, true);
+        //flapSnd = game.add.audio('flap');
         scoreSnd = game.add.audio('score');
         hurtSnd = game.add.audio('hurt');
         bonusSnd = game.add.audio('bonusSound');
@@ -237,6 +245,7 @@ function main() {
         birdie.reset(game.world.width / 4, game.world.height / 2);
         birdie.scale.setTo(2, 2);
         birdie.animations.play('fly');
+        //music.play('flap');
         fingers.removeAll();
         invs.removeAll();
         bullets.removeAll();
@@ -277,7 +286,8 @@ function main() {
         }
         if (!gameOver) {
             birdie.body.velocity.y = -FLAP;
-            flapSnd.play();
+            //flapSnd.play();
+            music.play('flap',true);
         }
     }
 
@@ -493,7 +503,8 @@ function main() {
         invs.remove(inv);
         score += 1;
         scoreText.setText(score + " Millonas");
-        scoreSnd.play();
+        //scoreSnd.play();
+        music.play('winning',true);
 
     }
     function addScoreBonus(_, bonus)
@@ -501,7 +512,8 @@ function main() {
         _bonus.remove(bonus);
         score += 1;
         scoreText.setText(score + " Millonas");
-        bonusSnd.play();
+        //bonusSnd.play();
+        music.play('bonus');
         _bonus.forEachAlive(function(bonus) {
             if (bonus.x + bonus.width < game.world.bounds.left) {
                 bonus.kill();
@@ -541,7 +553,8 @@ function main() {
         bulletsTimer.stop();
         // Make birdie reset the game
         game.input.onDown.addOnce(reset);
-        hurtSnd.play();
+        //hurtSnd.play();
+        music.play('hit');
     }
 
     function update() {
@@ -562,6 +575,7 @@ function main() {
                 birdie.frame = 3;
             } else {
                 birdie.animations.play('fly');
+               
             }
             // Birdie is DEAD!
             if (gameOver) {
